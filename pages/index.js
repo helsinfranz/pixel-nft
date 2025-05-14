@@ -16,24 +16,21 @@ const generateBackgroundGradient = (x, y, imageData) => {
   // Check if this position is part of the main image
   const key = `${x} ${y}`;
   if (imageData[key]) return imageData[key];
+  // Create different background patterns based on position      
+  const normalizedX = x / 31;  // Normalize to 0-1
+  const normalizedY = y / 31;  // Normalize to 0-1
 
-  // Create different background patterns based on position
-  const normalizedX = x / 15;  // Normalize to 0-1
-  const normalizedY = y / 15;  // Normalize to 0-1
-  
   // Generate base colors for gradient
   const r = Math.floor(20 + (normalizedX * normalizedY * 40));
   const g = Math.floor(20 + (normalizedY * 40));
   const b = Math.floor(40 + (normalizedX * 60));
-  
+
   // Add some noise/variation
   const noise = Math.sin(x * 0.5 + y * 0.7) * 10;
-  
+
   // Convert to hex color
-  const color = `#${Math.max(0, Math.min(255, r + noise)).toString(16).padStart(2, '0')}${
-    Math.max(0, Math.min(255, g + noise)).toString(16).padStart(2, '0')}${
-    Math.max(0, Math.min(255, b + noise)).toString(16).padStart(2, '0')}`;
-  
+  const color = `#${Math.max(0, Math.min(255, r + noise)).toString(16).padStart(2, '0')}${Math.max(0, Math.min(255, g + noise)).toString(16).padStart(2, '0')}${Math.max(0, Math.min(255, b + noise)).toString(16).padStart(2, '0')}`;
+
   return color;
 };
 
@@ -95,10 +92,10 @@ export default function Home() {
       }
 
       const data = await response.json()
-
-      console.log("API Response:", data)      // Create a 16x16 grid with an interesting gradient background
-      const grid = Array(16).fill().map((_, y) => 
-        Array(16).fill().map((_, x) => {
+      
+      // Create a 32x32 grid with an interesting gradient background
+      const grid = Array(32).fill().map((_, y) =>
+        Array(32).fill().map((_, x) => {
           // Create a subtle gradient background
           const gradientColor = generateBackgroundGradient(x, y, data.image || {});
           return parseInt(gradientColor.replace('#', ''), 16);
@@ -111,7 +108,7 @@ export default function Home() {
           const [x, y] = coords.split(' ').map(Number)
           // Convert hex color to number (removing the # if present)
           const colorNum = parseInt(color.replace('#', ''), 16)
-          if (x >= 0 && x < 16 && y >= 0 && y < 16) {
+          if (x >= 0 && x < 32 && y >= 0 && y < 32) {
             grid[y][x] = colorNum
           }
         })
@@ -142,14 +139,12 @@ export default function Home() {
     try {
       if (pixelGrid.length === 0) {
         throw new Error("Cannot generate image from an empty array");
-      }
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 256;
-      canvas.height = 256;
+      } const canvas = document.createElement("canvas");
+      canvas.width = 512;
+      canvas.height = 512;
       const ctx = canvas.getContext('2d');
 
-      const scale = 16; // Scale factor from 16x16 to 256x256
+      const scale = 16; // Scale factor from 32x32 to 512x512 (16 pixels per grid cell)
 
       for (let i = 0; i < pixelGrid.length; i++) {
         const row = pixelGrid[i];

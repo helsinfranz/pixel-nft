@@ -12,6 +12,9 @@ export default function PixelGrid({ grid }) {
     const ctx = canvas.getContext("2d")
     if (!ctx) return
 
+    // Set canvas size for 32x32 grid
+    canvas.width = 384  // 32 * 12 (12 pixels per grid cell)
+    canvas.height = 384
     const pixelSize = canvas.width / grid.length
 
     // Clear canvas
